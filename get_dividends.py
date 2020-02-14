@@ -12,17 +12,20 @@ def write_dict_to_csv(action_dict):
         dict_writer.writeheader()
         dict_writer.writerows(action_dict)
 
+def get_actions(ticker):
+    stock = yf.Ticker(ticker)
+    actions = stock.actions.to_dict()
+    divs = [flatten_and_enhance_dict(x, ticker, 'Dividend') for x in actions['Dividends'].items() if x[1] != 0]
+    splits = [flatten_and_enhance_dict(x, ticker, 'Split') for x in actions['Stock Splits'].items() if x[1] != 0]
+    final_actions = divs + splits
+    return final_actions
+
 def main():
     all_actions = []
     with open('utilities.txt') as f:
         for line in f:
             ticker = line.strip()
-            stock = yf.Ticker(ticker)
-            actions = stock.actions.to_dict()
-            divs = [flatten_and_enhance_dict(x, ticker, 'Dividend') for x in actions['Dividends'].items() if x[1] != 0]
-            splits = [flatten_and_enhance_dict(x, ticker, 'Split') for x in actions['Stock Splits'].items() if x[1] != 0]
-            final_actions = divs + splits
-            all_actions = all_actions + final_actions
+            all_actions = all_actions + get_actions(ticker)
     write_dict_to_csv(all_actions)
 
 if __name__ == '__main__':
