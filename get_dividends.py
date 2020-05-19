@@ -2,6 +2,10 @@ import csv
 
 import yfinance as yf
 
+def sort_dividends(dividends):
+    sorted_divs = sorted(dividends, key=lambda k: k['Date'])
+    return sorted_divs
+
 def mod_divs(dividends, modifier):
     for i, div in enumerate(dividends):
         dividends[i].update({'Amount': float(div['Amount'])/modifier})
@@ -29,7 +33,7 @@ def get_actions(ticker):
     actions = stock.actions.to_dict()
     divs = [flatten_and_enhance_dict(x, ticker, 'Dividend') for x in actions['Dividends'].items() if x[1] != 0]
     splits = [flatten_and_enhance_dict(x, ticker, 'Split') for x in actions['Stock Splits'].items() if x[1] != 0]
-    final_actions = divs + splits
+    final_actions = sort_dividends(divs + splits)
     return modify_dividends(final_actions)
 
 def main():

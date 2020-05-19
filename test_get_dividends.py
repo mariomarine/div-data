@@ -2,6 +2,7 @@ import unittest
 from pandas import Timestamp
 
 from get_dividends import modify_dividends
+from get_dividends import sort_dividends
 
 class TestControl(unittest.TestCase):
 
@@ -11,6 +12,16 @@ class TestControl(unittest.TestCase):
 class TestGetDividends(unittest.TestCase):
 
     maxDiff = None
+
+    def test_sort_dividends_simple(self):
+        dividend_history = [{'Amount': 2.0, 'Type': 'Dividend', 'Date': Timestamp(2001, 01, 01)},
+                            {'Amount': 2, 'Type': 'Split', 'Date': Timestamp(2002, 01, 01)},
+                            {'Amount': 1.0, 'Type': 'Dividend', 'Date': Timestamp(2000, 01, 01)}]
+        sorted_dividend_history = [{'Amount': 1.0, 'Type': 'Dividend', 'Date': Timestamp(2000, 01, 01)},
+                                     {'Amount': 2.0, 'Type': 'Dividend', 'Date': Timestamp(2001, 01, 01)},
+                                     {'Amount': 2, 'Type': 'Split', 'Date': Timestamp(2002, 01, 01)}]
+
+        self.assertEqual(sort_dividends(dividend_history), sorted_dividend_history)
 
     def test_modify_dividends_simple(self):
         dividend_history = [{'Amount': 1, 'Type': 'Dividend', 'Date': Timestamp(2000, 01, 01)},
